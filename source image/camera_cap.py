@@ -17,7 +17,7 @@ while capture.isOpened():
     ret, img = capture.read()           # 다음 프레임 읽기
     if ret:                         # 프레임 읽기 정상
         cv2.imshow('camera', img)
-        if time.time() - cur_time > 0.5:
+        if time.time() - cur_time > 0.3:
             save_images.append(img)
             cur_time = time.time()
     else:
@@ -46,8 +46,6 @@ except Exception as ex:
 now = datetime.now()
 
 try:
-    # os.chdir('./images')
-# print(os.curdir())
     os.makedirs('images/{month}-{day}-{hour}'.format(month=now.month, day=now.day, hour=now.hour))
 except Exception as ex:
     print('already make it', ex)
