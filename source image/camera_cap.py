@@ -3,7 +3,7 @@ import os
 import time
 from datetime import datetime
 
-capture = cv2.VideoCapture(1)
+capture = cv2.VideoCapture(0)
 capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 save_images = []
