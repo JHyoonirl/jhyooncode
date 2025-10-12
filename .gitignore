@@ -1,3 +1,9 @@
 *.png
 Sulivan_train/
 Sulivan-model-3/
+camera_calibration/fisheyelens/calibration_images/
+*.MP4
+*.ply
+*.json
+*.calibdata
+*.uson
