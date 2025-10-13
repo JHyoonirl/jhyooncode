@@ -7,3 +7,6 @@ camera_calibration/fisheyelens/calibration_images/
 *.json
 *.calibdata
 *.uson
+*.avi
+*.yml
+*.jpg
