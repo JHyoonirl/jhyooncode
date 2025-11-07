@@ -62,22 +62,26 @@ def undistort_and_save_video(input_video_path, calib_file):
     # 3. 출력 비디오 설정
     # 출력 파일명 생성: 원본파일명_undistorted.mp4
     input_base, input_ext = os.path.splitext(os.path.basename(input_video_path))
-    output_video_path = f"{input_base}_undistorted.mp4"
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))    
     
-    out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
+    output_video_name = f"{input_base}_undistorted.mp4"
+    video_path = os.path.join(script_dir, 'videos', 'undistorted_videos', output_video_name)
+    
+    out = cv2.VideoWriter(video_path, fourcc, fps, (width, height))
     
     if not out.isOpened():
-        print(f"\n❌ 오류: 출력 비디오 파일 {output_video_path}를 설정할 수 없습니다. (코덱 문제일 수 있음)")
+        print(f"\n❌ 오류: 출력 비디오 파일 {video_path}를 설정할 수 없습니다. (코덱 문제일 수 있음)")
         cap.release()
         return
 
-    print(f"\n--- 동영상 왜곡 보정 및 저장 시작: {output_video_path} ---")
+    print(f"\n--- 동영상 왜곡 보정 및 저장 시작: {video_path} ---")
     
     # 새로운 카메라 매트릭스 계산 및 맵 생성
     # alpha=1.0: 모든 원본 픽셀 포함 (검은색 테두리 가능)
     # alpha=0.0: 유효 픽셀만 포함 (이미지 잘림 가능)
     new_camMatrix, roi = cv2.getOptimalNewCameraMatrix(
-        camMatrix, distCoeffs, (width, height), 1, (width, height)
+        camMatrix, distCoeffs, (width, height), 0, (width, height)
     )
     
     # 효율적인 보정을 위한 맵 생성 (cv2.remap에 사용)
@@ -105,7 +109,7 @@ def undistort_and_save_video(input_video_path, calib_file):
     # 자원 해제 및 완료
     cap.release()
     out.release()
-    print(f"\n✅ 동영상 왜곡 보정 완료. 총 {frame_count} 프레임이 {output_video_path}에 저장되었습니다.")
+    print(f"\n✅ 동영상 왜곡 보정 완료. 총 {frame_count} 프레임이 {video_path}에 저장되었습니다.")
 
 # -------------------------------------------------------------
 
@@ -121,7 +125,7 @@ if __name__ == "__main__":
     video_filename = args.video
     calib_filename = args.calib
     
-    video_path = os.path.join(script_dir, 'videos', video_filename)
+    video_path = os.path.join(script_dir, 'videos', 'raw_videos', video_filename)
     calib_path = os.path.join(script_dir, 'param', calib_filename)
     # path_attempt_2 = os.path.join(script_dir, video_filename)
 

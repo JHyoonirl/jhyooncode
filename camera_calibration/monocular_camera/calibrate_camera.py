@@ -161,6 +161,9 @@ def run_charuco_calibration_and_detection(video_path, calib_file):
     
     totalIterations = 0
 
+    # [추가] 캘리브레이션 데이터로 고려할 만한 '유효' 감지 횟수를 세는 카운터
+    valid_detection_count = 0 
+
     while True:
         ret, frame = cap.read()
         if not ret: break
@@ -173,14 +176,21 @@ def run_charuco_calibration_and_detection(video_path, calib_file):
         
         # 4. 자세 추정 및 데이터 수집
         rvec, tvec, validPose = np.zeros((3, 1), dtype=np.float64), np.zeros((3, 1), dtype=np.float64), False
-        
-        if charucoIds is not None and len(charucoIds) >= 4:
-            
-            # 캘리브레이션용 데이터 수집
-            all_charuco_corners.append(charucoCorners)
-            all_charuco_ids.append(charucoIds)
-            if frame_size is None:
-                frame_size = frame.shape[1::-1] # (width, height)
+        # length = len(all_charuco_corners)
+
+        if charucoIds is not None and len(charucoIds) >= 4 and len(charucoCorners) >= (SQUARES_X - 1) * (SQUARES_Y - 1):
+
+            # --- 수정된 로직: 5의 배수일 때만 저장 ---
+            valid_detection_count += 1
+
+            # 현재까지 유효하게 감지된 횟수 (valid_detection_count)가 3의 배수일 때만 저장 실행
+            if valid_detection_count % 3 == 0:
+
+                # 캘리브레이션용 데이터 수집
+                all_charuco_corners.append(charucoCorners)
+                all_charuco_ids.append(charucoIds)
+                if frame_size is None:
+                    frame_size = frame.shape[1::-1] # (width, height)
             
             # 자세 추정 (Pose Estimation)
             if pose_enabled:
@@ -204,7 +214,7 @@ def run_charuco_calibration_and_detection(video_path, calib_file):
             cv2.putText(frame_copy, "Collecting Data" if charucoIds is not None and len(charucoIds) >= 4 else "No Board Found", 
                         (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             
-        cv2.putText(frame_copy, f"Total Collected: {len(all_charuco_corners)}", 
+        cv2.putText(frame_copy, f"Total Collected: {valid_detection_count}", 
                     (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
         
         cv2.imshow("ChArUco Detection & Data Collection", frame_copy)
@@ -212,9 +222,9 @@ def run_charuco_calibration_and_detection(video_path, calib_file):
         if cv2.waitKey(wait_time) == 27: # ESC
             break
 
-        if len(all_charuco_corners) >= 50:
-            print("✅ 50개 이상의 유효 프레임이 수집되어 자동으로 종료합니다.")
-            break
+        # if len(all_charuco_corners) >= 50:
+        #     print("✅ 50개 이상의 유효 프레임이 수집되어 자동으로 종료합니다.")
+        #     break
 
     # 자원 해제
     cap.release()
@@ -248,7 +258,7 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
     video_filename = args.video
     
-    path_attempt_1 = os.path.join(script_dir, 'videos', video_filename)
+    path_attempt_1 = os.path.join(script_dir, 'videos', 'raw_videos', video_filename)
     path_attempt_2 = os.path.join(script_dir, video_filename)
 
     full_video_path = None

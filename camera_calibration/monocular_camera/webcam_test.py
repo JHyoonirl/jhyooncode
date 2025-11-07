@@ -60,11 +60,12 @@ def load_detector_params_from_yaml(filepath):
     return params
 
 # --- 1. ChArUco 보드 설정 ---
-SQUARES_X = 8
-SQUARES_Y = 10
-SQUARE_LENGTH = 0.02
-MARKER_LENGTH = 0.0145
-DICTIONARY = aruco.getPredefinedDictionary(aruco.DICT_5X5_250)
+SQUARES_X = 5
+SQUARES_Y = 7
+SQUARE_LENGTH = 0.032
+MARKER_LENGTH = 0.019
+DICTIONARY_ID = cv2.aruco.DICT_6X6_250
+DICTIONARY = aruco.getPredefinedDictionary(DICTIONARY_ID)
 
 # ChArUco 보드 객체 생성
 board = aruco.CharucoBoard(
